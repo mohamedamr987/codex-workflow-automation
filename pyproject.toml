@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codexflow"
+version = "0.4.1"
+description = "Template-driven CLI to automate coding workflows with role-based prompts"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Codexflow" }]
+license = { text = "MIT" }
+keywords = ["cli", "automation", "codex", "workflow"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Environment :: Console",
+]
+dependencies = [
+  "PyYAML>=6.0",
+]
+
+[project.scripts]
+codexflow = "codexflow.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
