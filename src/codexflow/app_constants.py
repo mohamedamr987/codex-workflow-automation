@@ -72,7 +72,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "profiles": {
         DEFAULT_PROFILE_NAME: {
             "command": "codex",
-            "args": [],
+            "args": ["exec"],
             "prompt_mode": "stdin",
             "prompt_flag": "--prompt",
         }

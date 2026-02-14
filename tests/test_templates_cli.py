@@ -13,6 +13,9 @@ class TemplateCliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             cwd = Path(tmp)
             self.assertEqual(run_cli(cwd, "init").returncode, 0)
+            default_profile = json.loads(run_cli(cwd, "profile", "show", "default").stdout)
+            self.assertEqual(default_profile["command"], "codex")
+            self.assertIn("exec", default_profile["args"])
             proc_list = run_cli(cwd, "list")
             self.assertEqual(proc_list.returncode, 0, proc_list.stderr)
             self.assertIn("planning.json", proc_list.stdout)

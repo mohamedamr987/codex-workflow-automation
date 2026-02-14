@@ -27,6 +27,15 @@ from ..core import (
 )
 
 
+def _normalize_optional_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text or text.lower() in {"null", "none"}:
+        return None
+    return text
+
+
 def command_ai(args: argparse.Namespace) -> int:
     root = resolve_root(args.root)
     ensure_initialized(root)
@@ -99,22 +108,22 @@ def command_ai(args: argparse.Namespace) -> int:
         raise SystemExit("Generated template has invalid scope. Expected general or specific.")
     data["scope"] = scope
 
-    specific_to = args.specific_to.strip() if args.specific_to else str(generated.get("specific_to", "")).strip() or None
+    specific_to = args.specific_to.strip() if args.specific_to else _normalize_optional_text(generated.get("specific_to"))
     if scope == "specific" and not specific_to:
         raise SystemExit("Generated template scope is specific but specific_to is empty. Retry with --specific-to.")
     if scope == "specific" and specific_to:
         data["specific_to"] = specific_to
 
-    bind_profile = args.bind_profile or (str(generated.get("profile", "")).strip() or None)
+    bind_profile = args.bind_profile or _normalize_optional_text(generated.get("profile"))
     if bind_profile:
         ensure_profile_exists(cfg, bind_profile)
         data["profile"] = bind_profile
 
-    repeat_for = args.repeat_for.strip() if args.repeat_for else str(generated.get("repeat_for", "")).strip() or None
+    repeat_for = args.repeat_for.strip() if args.repeat_for else _normalize_optional_text(generated.get("repeat_for"))
     if repeat_for:
         parse_duration_seconds(repeat_for, "repeat_for")
         data["repeat_for"] = repeat_for
-    repeat_every = args.repeat_every.strip() if args.repeat_every else str(generated.get("repeat_every", "")).strip() or None
+    repeat_every = args.repeat_every.strip() if args.repeat_every else _normalize_optional_text(generated.get("repeat_every"))
     if repeat_every:
         parse_duration_seconds(repeat_every, "repeat_every")
         data["repeat_every"] = repeat_every
