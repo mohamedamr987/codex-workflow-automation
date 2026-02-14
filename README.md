@@ -14,6 +14,7 @@ You can define reusable roles like `planning`, `testing`, and `review`, bind eac
 - Role scope metadata: `general` or `specific` with `specific_to`
 - Runner profiles (multiple Codex setups)
 - Per-template profile binding, with run-time profile override
+- Per-template default repeat runtime (for example repeat for 2h)
 - Variable placeholders in prompts: `{{task}}`, `{{root}}`, custom vars via `--var`
 - Dry-run mode to preview prompts before execution
 
@@ -66,11 +67,23 @@ codexflow create triage \
   --format yaml
 ```
 
+Set template default runtime (repeat workflow automatically):
+
+```bash
+codexflow create daily-check \
+  --description "Repeat checks for 2 hours" \
+  --role "You validate {{task}} continuously." \
+  --instructions "Run checks and report findings." \
+  --repeat-for 2h \
+  --repeat-every 10m
+```
+
 ## Edit and rename roles
 
 ```bash
 codexflow edit checkout-tester --description "Checkout QA owner"
 codexflow rename checkout-tester checkout-qa --format yaml
+codexflow edit daily-check --repeat-for 2h --repeat-every 5m
 ```
 
 ## AI create/update command
@@ -89,6 +102,12 @@ Force metadata while generating:
 
 ```bash
 codexflow ai "Make this role general and reusable" --name qa-owner --scope general --bind-profile default
+```
+
+You can also force default repeat runtime in generated templates:
+
+```bash
+codexflow ai "Create a reliability role that repeats for two hours" --name reliability-loop --repeat-for 2h --repeat-every 10m
 ```
 
 ## Variables
@@ -111,6 +130,22 @@ codexflow run triage "Investigate timeout" --var owner=qa-team --var priority=hi
 ```
 
 Use `--strict-vars` to fail when placeholders are unresolved.
+
+## Repeat runtime
+
+`run` executes once by default.
+
+If a template has `repeat_for` (or you pass `--repeat-for`), it repeats automatically.
+
+Examples:
+
+```bash
+# Use template defaults
+codexflow run daily-check "Verify API health"
+
+# Override runtime for this execution only
+codexflow run daily-check "Verify API health" --repeat-for 2h --repeat-every 5m
+```
 
 ## Runner profiles
 
@@ -145,13 +180,13 @@ codexflow profile default-format yaml
 - `codexflow init [--force]`
 - `codexflow list`
 - `codexflow show <name>`
-- `codexflow create <name> --description ... --role ... --instructions ... [--profile ...] [--scope general|specific] [--specific-to ...] [--format json|yaml] [--force]`
-- `codexflow edit <name> [--description ...] [--role ...] [--instructions ...] [--profile ...|--clear-profile] [--scope general|specific] [--specific-to ...|--clear-specific-to]`
+- `codexflow create <name> --description ... --role ... --instructions ... [--profile ...] [--scope general|specific] [--specific-to ...] [--repeat-for ...] [--repeat-every ...] [--format json|yaml] [--force]`
+- `codexflow edit <name> [--description ...] [--role ...] [--instructions ...] [--profile ...|--clear-profile] [--scope general|specific] [--specific-to ...|--clear-specific-to] [--repeat-for ...] [--repeat-every ...] [--clear-repeat|--clear-repeat-every]`
 - `codexflow rename <source> <target> [--format json|yaml] [--force]`
 - `codexflow copy <source> <target> [--format json|yaml] [--force]`
 - `codexflow delete <name>`
-- `codexflow run <name> <task> [--extra ...] [--profile ...] [--var KEY=VALUE] [--strict-vars] [--dry-run] [--print-command]`
-- `codexflow ai <request...> [--name ...] [--runner-profile ...] [--bind-profile ...] [--scope general|specific] [--specific-to ...] [--format json|yaml] [--dry-run] [--print-command]`
+- `codexflow run <name> <task> [--extra ...] [--profile ...] [--var KEY=VALUE] [--strict-vars] [--repeat-for ...] [--repeat-every ...] [--max-runs ...] [--continue-on-error] [--dry-run] [--print-command]`
+- `codexflow ai <request...> [--name ...] [--runner-profile ...] [--bind-profile ...] [--scope general|specific] [--specific-to ...] [--repeat-for ...] [--repeat-every ...] [--format json|yaml] [--dry-run] [--print-command]`
 - `codexflow profile list`
 - `codexflow profile show <name>`
 - `codexflow profile add <name> --command ... [--arg ...] [--prompt-mode stdin|arg] [--prompt-flag ...] [--force]`

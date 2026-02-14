@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codexflow"
-version = "0.4.1"
+version = "0.5.0"
 description = "Template-driven CLI to automate coding workflows with role-based prompts"
 readme = "README.md"
 requires-python = ">=3.9"
